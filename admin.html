@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="az"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow"><title>Admin panel | Rəfiqə Portfolio</title>
+<link rel="stylesheet" href="styles.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head><body>
+<div class="admin-wrap">
+  <div class="admin-top"><a class="brand" href="index.html">RH<span>.</span> portfolio</a><a class="pill light" href="index.html">Sayta qayıt ↗</a></div>
+  <div class="kicker">Portfolio idarəetməsi</div><h1 class="admin-title">Admin panel</h1>
+  <p class="sub">CV və sənədləri yüklə, ictimai layihə keçidlərini idarə et və sayta aid hadisələri yoxla.</p>
+  <div class="notice" style="margin:18px 0">İlk istifadə üçün Supabase layihəsi, SQL cədvəlləri və admin istifadəçisi qurulmalıdır. <code>README.md</code> faylındakı addımları izlə.</div>
+
+  <section class="panel" id="setupPanel">
+    <h3>Bağlantı və giriş</h3>
+    <p class="sub">Admin girişi Supabase Auth ilə qorunur. Anon açar parol deyil və server sirri kimi istifadə edilməməlidir.</p>
+    <div class="field"><label for="email">Admin e-poçtu</label><input id="email" type="email" autocomplete="username" placeholder="admin@example.com"></div>
+    <div class="field"><label for="password">Şifrə</label><input id="password" type="password" autocomplete="current-password" placeholder="Şifrəniz"></div>
+    <div class="actions"><button class="pill" id="loginBtn">Daxil ol</button><button class="pill light" id="logoutBtn" type="button">Çıxış</button></div>
+    <p id="authStatus" class="status">Supabase parametrləri yoxlanılır…</p>
+  </section>
+
+  <div id="adminContent" class="hidden">
+    <section class="panel"><h3>Statistika</h3><p class="sub">Bu göstəricilər saytın event cədvəlində qeydə alınan hadisələrdir; Google Analytics hesabatları ayrıca GA4-də görünür.</p>
+      <div class="metric-grid" style="margin-top:16px">
+        <div class="metric"><strong id="viewsMetric">—</strong><span>Səhifə baxışı</span></div>
+        <div class="metric"><strong id="projectMetric">—</strong><span>Layihə klikləri</span></div>
+        <div class="metric"><strong id="linkMetric">—</strong><span>Qısa keçid klikləri</span></div>
+      </div><p id="statsStatus" class="status"></p>
+    </section>
+
+    <section class="panel"><h3>Yeni layihə keçidi</h3>
+      <form id="linkForm"><div class="form-grid">
+        <div class="field"><label for="linkName">Layihənin adı</label><input id="linkName" maxlength="100" required placeholder="Kredit Dashboard"></div>
+        <div class="field"><label for="linkUrl">Layihənin URL-i</label><input id="linkUrl" type="url" required placeholder="https://..."></div>
+      </div><label><input id="linkPublic" type="checkbox" checked> Saytda göstər</label><div class="actions"><button class="pill" type="submit">Linki yadda saxla</button></div></form>
+      <div id="linksAdmin" class="admin-list" style="margin-top:18px"></div>
+    </section>
+
+    <section class="panel"><h3>CV və portfolio sənədləri</h3><p class="sub">PDF CV və portfolio faylları Supabase Storage-a yüklənir. Yüklənən fayllar ictimai portfolioda görünə bilər.</p>
+      <form id="fileForm"><div class="form-grid">
+        <div class="field"><label for="fileCategory">Fayl növü</label><select id="fileCategory"><option value="cv">CV (PDF)</option><option value="document">Portfolio sənədi</option></select></div>
+        <div class="field"><label for="filePicker">Fayl seç</label><input id="filePicker" type="file" required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.txt,.md,.png,.jpg,.jpeg"></div>
+      </div><label><input id="filePublic" type="checkbox" checked> İctimai saytda göstər</label><div class="actions"><button class="pill" type="submit">Faylı yüklə</button></div></form>
+      <div id="filesAdmin" class="admin-list" style="margin-top:18px"></div>
+    </section>
+  </div>
+  <p class="status">Təhlükəsizlik: yalnız öz Supabase layihənizdəki admin istifadəçisini yaradın. <code>service_role</code> açarını bu sayta heç vaxt qoymayın.</p>
+</div>
+<script src="config.js"></script><script src="admin.js"></script>
+</body></html>

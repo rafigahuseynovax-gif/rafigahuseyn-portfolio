@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Rəfiqə Hüseynova — Business Analysis, Product, BPMN portfolio">
+<title>Rəfiqə Hüseynova | Portfolio</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google Analytics: öz G-... Measurement ID-ni əlavə etdikdən sonra aktiv olacaq. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  // TODO: G-XXXXXXXXXX hissəsini öz GA4 Measurement ID-nizlə əvəz edin.
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+</head>
+<body>
+<header class="nav"><div class="wrap navin">
+  <a class="brand" href="#home">RH<span>.</span> portfolio</a>
+  <nav class="links"><a href="#projects">Layihələr</a><a href="#quick-links">Qısa keçidlər</a><a href="#bpmn">BPMN</a><a href="#cv">CV</a><a href="#contact">Kontakt</a></nav>
+  <div class="nav-actions"><a class="pill light" href="admin.html">Admin</a><a class="pill" href="#contact">Əlaqə ↗</a></div>
+</div></header>
+<main class="wrap" id="home">
+<section class="hero">
+  <div><div class="eyebrow"><span class="dot"></span> Business · Product · Process</div>
+  <h1>Rəfiqə<br><em>Hüseynova</em></h1>
+  <p class="lead">Biznes analizi, rəqəmsal məhsullar, bank əməliyyatları və müştəri səyahətləri üzrə portfolio.</p>
+  <div class="actions"><a class="pill" href="#projects">Layihələrə bax ↘</a><a class="pill light" href="#cv">CV bölməsi</a></div></div>
+  <div class="hero-card"><div class="cardlabel">Business analysis · Product</div><div class="monogram">R<span>H</span></div><small>Biznes ehtiyaclarını aydın tələblərə və strukturlaşdırılmış proseslərə çevirirəm.</small></div>
+</section>
+<div class="stats">
+  <div class="stat"><strong>BA</strong><span>Business Analysis</span></div>
+  <div class="stat"><strong>PRD</strong><span>Product Requirements</span></div>
+  <div class="stat"><strong>BPMN</strong><span>Process Modeling</span></div>
+</div>
+
+<section class="section" id="projects">
+  <div class="sectionhead"><div><div class="kicker">01 / Seçilmiş işlər</div><h2>Layihələr</h2></div><p class="sub">Kateqoriyanı seçərək layihələri PRD, Miro, Figma AI və BPMN üzrə filtrlə.</p></div>
+  <div class="filters">
+    <button class="filter active" data-filter="all">Hamısı</button><button class="filter" data-filter="prd">PRD</button><button class="filter" data-filter="miro">Miro</button><button class="filter" data-filter="figma">Figma AI</button><button class="filter" data-filter="bpmn">BPMN</button>
+  </div>
+  <div class="projects" id="projectGrid">
+    <article class="project" data-tags="prd miro bpmn"><div class="projecttop"><span class="type">PRD · Miro · BPMN</span><span class="arrow">↗</span></div><h3>Mobile Banking — Kredit müraciəti</h3><p>Kredit müraciəti ssenarisi üzrə məhsul və proses nümunəsi.</p><div class="chips"><span class="chip">Requirements</span><span class="chip">Process flow</span></div></article>
+    <article class="project" data-tags="figma"><div class="projecttop"><span class="type">Figma AI</span><span class="arrow">↗</span></div><h3>Mobile Banking App for Loans</h3><p>Mobil bankçılıqda kredit müraciəti üçün Figma AI ilə yaradılmış konsept.</p><div class="chips"><span class="chip">Prototype</span><span class="chip">Mobile app</span></div><div class="project-actions"><a class="pill" href="https://www.figma.com/make/gNwYSlySeoBrVERCAnieNV/Mobile-Banking-App-for-Loans?p=f" target="_blank" rel="noopener noreferrer">Figma AI layihəsini aç ↗</a></div></article>
+    <article class="project" data-tags="miro bpmn"><div class="projecttop"><span class="type">Miro · BPMN</span><span class="arrow">↗</span></div><h3>Biznes prosesinin modelləşdirilməsi</h3><p>Proses mərhələləri, qərar nöqtələri və müştəri axınının vizuallaşdırılması.</p><div class="chips"><span class="chip">Process mapping</span><span class="chip">As-is / To-be</span></div><div class="project-actions"><a class="pill light" href="https://miro.com/" target="_blank" rel="noopener noreferrer">Miro ↗</a></div></article>
+    <article class="project" data-tags="prd"><div class="projecttop"><span class="type">PRD · PDF</span><span class="arrow">↗</span></div><h3>Kredit müraciəti üzrə PRD</h3><p>Yarımçıq qalan kredit müraciətini davam etdirmək və ya yenidən başlatmaq üçün məhsul tələbləri sənədi.</p><div class="chips"><span class="chip">User stories</span><span class="chip">Acceptance criteria</span><span class="chip">FR / NFR</span></div><div class="project-actions"><a class="pill light" href="PRD.pdf" target="_blank" rel="noopener noreferrer">PRD-ə bax ↗</a></div></article>
+  </div><p class="empty" id="emptyState">Bu kateqoriyada layihə yoxdur.</p>
+</section>
+
+<section class="section" id="quick-links">
+  <div class="sectionhead"><div><div class="kicker">02 / Sürətli giriş</div><h2>Layihələrə qısa keçidlər</h2></div><p class="sub">Admin paneldən əlavə edilən keçidlər burada görünəcək.</p></div>
+  <div id="quickLinksList" class="projects"></div><p class="empty" id="quickLinksEmpty">Hələ keçid əlavə edilməyib.</p>
+  <p class="sub tiny">Qısa keçidləri idarə etmək üçün Admin bölməsinə daxil olun.</p>
+</section>
+
+<section class="section" id="bpmn">
+  <div class="sectionhead"><div><div class="kicker">03 / Proses modelləşdirmə</div><h2>BPMN</h2></div><p class="sub">Kredit müraciətinin sadələşdirilmiş proses axını.</p></div>
+  <div class="bpmn-layout"><div class="bpmn-copy"><div class="kicker">Process overview</div><h3>Müraciət axını</h3><p>Prosesin əsas mərhələləri: müraciətin qəbulu, məlumatların yoxlanması və nəticənin bildirilməsi.</p><div class="steps">01 — Müraciət daxil olur<br>02 — Məlumatlar yoxlanılır<br>03 — Qərar verilir</div></div>
+  <div class="diagram"><div class="flow"><div class="node start">Başlanğıc</div><span class="connector">→</span><div class="node">Müraciəti qəbul et</div><span class="connector">→</span><div class="node">Məlumatları yoxla</div><span class="connector">→</span><div class="node">Qərar</div><span class="connector">→</span><div class="node end">Nəticə</div></div></div></div>
+</section>
+
+<section class="section" id="cv">
+  <div class="sectionhead"><div><div class="kicker">04 / CV & Sənədlər</div><h2>CV & Sənədlər</h2></div><p class="sub">Admin paneldə yüklənmiş CV və portfolio sənədləri ziyarətçilər üçün burada göstəriləcək.</p></div>
+  <div class="panel"><h3>CV</h3><p class="sub">CV-nin PDF versiyasına bax və ya yüklə.</p><div id="cvPublic" class="file-list"><p class="sub">CV faylı hələ əlavə edilməyib.</p></div></div>
+  <div class="panel"><h3>Portfolio sənədləri</h3><div id="documentsPublic" class="file-list"><p class="sub">Hələ əlavə edilmiş sənəd yoxdur.</p></div></div>
+</section>
+
+<section class="section" id="contact">
+  <div class="contactbox"><div><div class="kicker">05 / Kontakt</div><h2>Birlikdə dəyər yaradaq.</h2><p>Yeni layihə, əməkdaşlıq və ya iş imkanları üçün mənimlə əlaqə saxlaya bilərsən.</p></div>
+  <div class="contactlinks"><a class="contactlink" href="https://mail.google.com/mail/?view=cm&to=rafiga.huseynovax@gmail.com" target="_blank" rel="noopener noreferrer"><span>✉ rafiga.huseynovax@gmail.com</span><span>↗</span></a><a class="contactlink" href="https://www.linkedin.com/in/rafiga-huseynova-0691b31b3" target="_blank" rel="noopener noreferrer"><span>in LinkedIn profilim</span><span>↗</span></a></div></div>
+</section>
+<footer class="footer"><span>© <span id="year"></span> Rəfiqə Hüseynova</span><span>Sadə düşüncə. Aydın həllər.</span><a href="#home">Yuxarı ↑</a></footer>
+</main>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body></html>
