@@ -1,102 +1,23 @@
 (() => {
-  const $ = id => document.getElementById(id);
-  const cfg = window.PORTFOLIO_CONFIG || {};
-  const ready = window.supabase && cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('YOUR-PROJECT') &&
-    cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_ANON_KEY.includes('YOUR_SUPABASE');
-  if (!ready) {
-    $('authStatus').textContent = 'Supabase hələ qurulmayıb. config.js və README.md addımlarını tamamlayın.';
-    $('loginBtn').disabled = true;
-    return;
-  }
-  const client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
-  const bucket = cfg.STORAGE_BUCKET || 'portfolio-files';
-  let currentUser = null;
-
-  const message = (id, text) => { $(id).textContent = text; };
-  $('loginBtn').addEventListener('click', async () => {
-    message('authStatus', 'Giriş yoxlanılır…');
-    const { data, error } = await client.auth.signInWithPassword({email:$('email').value.trim(), password:$('password').value});
-    if (error) { message('authStatus', 'Giriş alınmadı: ' + error.message); return; }
-    currentUser = data.user; await refresh();
-  });
-  $('logoutBtn').addEventListener('click', async () => {
-    await client.auth.signOut(); currentUser = null; $('adminContent').classList.add('hidden');
-    message('authStatus', 'Sistemdən çıxış edildi.');
-  });
-  client.auth.getSession().then(({data}) => {
-    if (data.session) { currentUser = data.session.user; refresh(); }
-    else message('authStatus', 'Admin e-poçtu və şifrəsi ilə daxil olun.');
-  });
-
-  async function refresh() {
-    if (!currentUser) return;
-    $('adminContent').classList.remove('hidden');
-    message('authStatus', 'Daxil olundu: ' + currentUser.email);
-    await Promise.all([loadLinks(), loadFiles(), loadStats()]);
-  }
-  async function loadLinks() {
-    const {data,error} = await client.from('portfolio_links').select('*').order('created_at',{ascending:false});
-    const wrap = $('linksAdmin'); wrap.replaceChildren();
-    if (error) { message('authStatus', 'Linklər oxunmadı. README.md-dəki SQL və RLS quruluşunu yoxlayın.'); return; }
-    (data || []).forEach(item => {
-      const row = document.createElement('div'); row.className = 'admin-row';
-      const info = document.createElement('div'); info.textContent = item.name;
-      const small = document.createElement('small'); small.textContent = item.url + (item.is_public ? ' · İctimai' : ' · Gizli'); info.append(small);
-      const actions = document.createElement('div'); actions.className = 'actions';
-      const toggle = document.createElement('button'); toggle.className = 'pill light'; toggle.textContent = item.is_public ? 'Gizlət' : 'Göstər';
-      toggle.addEventListener('click', async () => { const {error} = await client.from('portfolio_links').update({is_public:!item.is_public}).eq('id',item.id); if(error) alert(error.message); else loadLinks(); });
-      const del = document.createElement('button'); del.className = 'pill light danger'; del.textContent = 'Sil';
-      del.addEventListener('click', async () => { if(!confirm('Bu linki silmək istəyirsiniz?')) return; const {error}=await client.from('portfolio_links').delete().eq('id',item.id); if(error) alert(error.message); else loadLinks(); });
-      actions.append(toggle,del); row.append(info,actions); wrap.append(row);
-    });
-  }
-  $('linkForm').addEventListener('submit', async e => {
-    e.preventDefault(); if(!currentUser) return;
-    const name = $('linkName').value.trim(), url = $('linkUrl').value.trim();
-    try { const parsed = new URL(url); if(!['https:','http:'].includes(parsed.protocol)) throw new Error(); } catch (_) { alert('Düzgün http/https linki daxil edin.'); return; }
-    const {error} = await client.from('portfolio_links').insert({name,url,is_public:$('linkPublic').checked,created_by:currentUser.id});
-    if(error) { alert('Yadda saxlamaq mümkün olmadı: '+error.message); return; }
-    $('linkForm').reset(); $('filePublic').checked = true; $('linkPublic').checked = true; await loadLinks();
-  });
-
-  async function loadFiles() {
-    const {data,error} = await client.from('portfolio_files').select('*').order('created_at',{ascending:false});
-    const wrap = $('filesAdmin'); wrap.replaceChildren();
-    if(error) { const p=document.createElement('p'); p.className='status'; p.textContent='Fayllar oxunmadı. SQL/RLS quruluşunu yoxlayın.'; wrap.append(p); return; }
-    (data||[]).forEach(item => {
-      const row=document.createElement('div'); row.className='admin-row';
-      const info=document.createElement('div'); info.textContent=item.file_name;
-      const small=document.createElement('small'); small.textContent=item.category+' · '+(item.is_public?'İctimai':'Gizli'); info.append(small);
-      const actions=document.createElement('div'); actions.className='actions';
-      const toggle=document.createElement('button'); toggle.className='pill light'; toggle.textContent=item.is_public?'Gizlət':'Göstər';
-      toggle.addEventListener('click',async()=>{const {error}=await client.from('portfolio_files').update({is_public:!item.is_public}).eq('id',item.id);if(error)alert(error.message);else loadFiles();});
-      const del=document.createElement('button'); del.className='pill light danger'; del.textContent='Sil';
-      del.addEventListener('click',async()=>{if(!confirm('Faylı və qeydini silmək istəyirsiniz?'))return; const {error:storageError}=await client.storage.from(bucket).remove([item.storage_path]); if(storageError){alert(storageError.message);return;} const {error}=await client.from('portfolio_files').delete().eq('id',item.id);if(error)alert(error.message);else loadFiles();});
-      actions.append(toggle,del); row.append(info,actions); wrap.append(row);
-    });
-  }
-  $('fileForm').addEventListener('submit', async e => {
-    e.preventDefault(); if(!currentUser) return;
-    const file=$('filePicker').files[0]; if(!file) return;
-    if($('fileCategory').value==='cv' && file.type!=='application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) { alert('CV yalnız PDF formatında olmalıdır.'); return; }
-    if(file.size > 20*1024*1024) { alert('Fayl 20 MB-dan kiçik olmalıdır.'); return; }
-    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    const path=Date.now()+'-'+crypto.randomUUID()+'-'+safeName;
-    message('authStatus','Fayl yüklənir…');
-    const {error:uploadError}=await client.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
-    if(uploadError){alert('Fayl yüklənmədi: '+uploadError.message);message('authStatus','Daxil olundu: '+currentUser.email);return;}
-    const {error}=await client.from('portfolio_files').insert({file_name:file.name,storage_path:path,category:$('fileCategory').value,is_public:$('filePublic').checked,uploaded_by:currentUser.id});
-    if(error){await client.storage.from(bucket).remove([path]);alert('Fayl qeydi yazılmadı: '+error.message);return;}
-    $('fileForm').reset(); $('filePublic').checked=true; message('authStatus','Fayl uğurla yükləndi.'); await loadFiles();
-  });
-
-  async function loadStats() {
-    const {data,error}=await client.from('portfolio_events').select('event_name');
-    if(error){message('statsStatus','Statistika cədvəlini oxumaq mümkün olmadı. SQL/RLS quruluşunu yoxlayın.');return;}
-    const rows=data||[];
-    $('viewsMetric').textContent=rows.filter(x=>x.event_name==='page_view').length;
-    $('projectMetric').textContent=rows.filter(x=>x.event_name==='project_click').length;
-    $('linkMetric').textContent=rows.filter(x=>x.event_name==='quick_link_click').length;
-    message('statsStatus','Statistika Supabase event cədvəlindən hesablanır. Trafik artdıqca daha geniş hesabat üçün GA4-dən istifadə edin.');
-  }
+ const $=id=>document.getElementById(id),cfg=window.PORTFOLIO_CONFIG||{};
+ const ready=window.supabase&&cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&!cfg.SUPABASE_URL.includes('YOUR-PROJECT')&&!cfg.SUPABASE_ANON_KEY.includes('YOUR_SUPABASE');
+ if(!ready){$('authStatus').textContent='Supabase hələ qurulmayıb. config.js parametrlərini yoxlayın.';$('loginBtn').disabled=true;return;}
+ const client=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY),bucket=cfg.STORAGE_BUCKET||'portfolio-files';let currentUser=null;
+ const message=(id,t)=>{if($(id))$(id).textContent=t;};
+ $('loginBtn').addEventListener('click',async()=>{message('authStatus','Giriş yoxlanılır…');const {data,error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error){message('authStatus','Giriş alınmadı: '+error.message);return;}currentUser=data.user;await refresh();});
+ $('logoutBtn').addEventListener('click',async()=>{await client.auth.signOut();currentUser=null;$('adminContent').classList.add('hidden');message('authStatus','Sistemdən çıxış edildi.');});
+ client.auth.getSession().then(({data})=>{if(data.session){currentUser=data.session.user;refresh();}else message('authStatus','Admin e-poçtu və şifrəsi ilə daxil olun.');});
+ async function refresh(){if(!currentUser)return;$('adminContent').classList.remove('hidden');message('authStatus','Daxil olundu: '+currentUser.email);await Promise.all([loadLinks(),loadFiles(),loadStats(),loadProcesses()]);}
+ async function loadLinks(){const {data,error}=await client.from('portfolio_links').select('*').order('created_at',{ascending:false});const wrap=$('linksAdmin');wrap.replaceChildren();if(error){message('authStatus','Linklər oxunmadı: '+error.message);return;}(data||[]).forEach(item=>{const row=document.createElement('div');row.className='admin-row';const info=document.createElement('div');info.textContent=item.name;const small=document.createElement('small');small.textContent=item.url+(item.is_public?' · İctimai':' · Gizli');info.append(small);const actions=document.createElement('div');actions.className='actions';const toggle=document.createElement('button');toggle.className='pill light';toggle.textContent=item.is_public?'Gizlət':'Göstər';toggle.onclick=async()=>{const {error}=await client.from('portfolio_links').update({is_public:!item.is_public}).eq('id',item.id);if(error)alert(error.message);else loadLinks();};const del=document.createElement('button');del.className='pill light danger';del.textContent='Sil';del.onclick=async()=>{if(confirm('Bu linki silmək istəyirsiniz?')){const {error}=await client.from('portfolio_links').delete().eq('id',item.id);if(error)alert(error.message);else loadLinks();}};actions.append(toggle,del);row.append(info,actions);wrap.append(row);});}
+ $('linkForm').addEventListener('submit',async e=>{e.preventDefault();const name=$('linkName').value.trim(),url=$('linkUrl').value.trim();try{if(!['https:','http:'].includes(new URL(url).protocol))throw 0;}catch{alert('Düzgün http/https linki daxil edin.');return;}const {error}=await client.from('portfolio_links').insert({name,url,is_public:$('linkPublic').checked,created_by:currentUser.id});if(error){alert(error.message);return;}$('linkForm').reset();$('linkPublic').checked=true;loadLinks();});
+ async function loadFiles(){const {data,error}=await client.from('portfolio_files').select('*').order('created_at',{ascending:false});const wrap=$('filesAdmin');wrap.replaceChildren();if(error){wrap.textContent='Fayllar oxunmadı: '+error.message;return;}(data||[]).forEach(item=>{const row=document.createElement('div');row.className='admin-row';const info=document.createElement('div');info.textContent=item.file_name;const small=document.createElement('small');small.textContent=item.category+' · '+(item.is_public?'İctimai':'Gizli');info.append(small);const actions=document.createElement('div');actions.className='actions';const toggle=document.createElement('button');toggle.className='pill light';toggle.textContent=item.is_public?'Gizlət':'Göstər';toggle.onclick=async()=>{const {error}=await client.from('portfolio_files').update({is_public:!item.is_public}).eq('id',item.id);if(error)alert(error.message);else loadFiles();};const del=document.createElement('button');del.className='pill light danger';del.textContent='Sil';del.onclick=async()=>{if(!confirm('Faylı silmək istəyirsiniz?'))return;const {error:se}=await client.storage.from(bucket).remove([item.storage_path]);if(se){alert(se.message);return;}const {error}=await client.from('portfolio_files').delete().eq('id',item.id);if(error)alert(error.message);else loadFiles();};actions.append(toggle,del);row.append(info,actions);wrap.append(row);});}
+ $('fileForm').addEventListener('submit',async e=>{e.preventDefault();const file=$('filePicker').files[0];if(!file)return;if($('fileCategory').value==='cv'&&file.type!=='application/pdf'){alert('CV yalnız PDF olmalıdır.');return;}if(file.size>20*1024*1024){alert('Fayl 20 MB-dan kiçik olmalıdır.');return;}const path=Date.now()+'-'+crypto.randomUUID()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const {error:up}=await client.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type});if(up){alert(up.message);return;}const {error}=await client.from('portfolio_files').insert({file_name:file.name,storage_path:path,category:$('fileCategory').value,is_public:$('filePublic').checked,uploaded_by:currentUser.id});if(error){await client.storage.from(bucket).remove([path]);alert(error.message);return;}$('fileForm').reset();$('filePublic').checked=true;loadFiles();});
+ async function loadStats(){const {data,error}=await client.from('portfolio_events').select('event_name');if(error){message('statsStatus','Statistika oxunmadı.');return;}const a=data||[];$('viewsMetric').textContent=a.filter(x=>x.event_name==='page_view').length;$('projectMetric').textContent=a.filter(x=>x.event_name==='project_click').length;$('linkMetric').textContent=a.filter(x=>x.event_name==='quick_link_click').length;message('statsStatus','Statistika Supabase event cədvəlindən hesablanır.');}
+ function resetProcess(){ $('processForm').reset();$('processId').value='';$('processImagePreview').replaceChildren();$('processSave').textContent='Prosesi yadda saxla';$('processPublic').checked=true; }
+ $('processCancel').addEventListener('click',resetProcess);
+ $('processImage').addEventListener('change',()=>{const f=$('processImage').files[0],p=$('processImagePreview');p.replaceChildren();if(f){const im=document.createElement('img');im.src=URL.createObjectURL(f);im.style='max-width:220px;max-height:130px;margin-top:10px;border-radius:12px';p.append(im);}});
+ async function loadProcesses(){const {data,error}=await client.from('process_cases').select('*').order('created_at',{ascending:false});const wrap=$('processesAdmin');wrap.replaceChildren();if(error){wrap.textContent='Proses cədvəli tapılmadı. Supabase SQL əlavəsini icra edin.';return;}(data||[]).forEach(item=>{const row=document.createElement('div');row.className='admin-row';const info=document.createElement('div');info.textContent=item.title;const sm=document.createElement('small');sm.textContent=(item.category||'Proses')+' · '+(item.is_public?'İctimai':'Gizli');info.append(sm);const actions=document.createElement('div');actions.className='actions';const edit=document.createElement('button');edit.className='pill light';edit.textContent='Redaktə';edit.onclick=()=>{ $('processId').value=item.id;$('processTitle').value=item.title;$('processCategory').value=item.category||'';$('processDescription').value=item.description||'';$('processStory').value=item.user_story||'';$('processCriteria').value=item.acceptance_criteria||'';$('processPublic').checked=item.is_public;$('processSave').textContent='Dəyişiklikləri saxla';window.scrollTo({top:$('processForm').getBoundingClientRect().top+scrollY-30,behavior:'smooth'});};const toggle=document.createElement('button');toggle.className='pill light';toggle.textContent=item.is_public?'Gizlət':'Göstər';toggle.onclick=async()=>{const {error}=await client.from('process_cases').update({is_public:!item.is_public}).eq('id',item.id);if(error)alert(error.message);else loadProcesses();};const del=document.createElement('button');del.className='pill light danger';del.textContent='Sil';del.onclick=async()=>{if(!confirm('Bu proses nümunəsini silmək istəyirsiniz?'))return;const {error:se}=await client.storage.from(bucket).remove([item.image_path]);if(se){alert(se.message);return;}const {error}=await client.from('process_cases').delete().eq('id',item.id);if(error)alert(error.message);else loadProcesses();};actions.append(edit,toggle,del);row.append(info,actions);wrap.append(row);});}
+ $('processForm').addEventListener('submit',async e=>{e.preventDefault();const id=$('processId').value,file=$('processImage').files[0];if(!id&&!file){alert('Yeni proses üçün şəkil seçin.');return;}if(file&&(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>10*1024*1024)){alert('PNG, JPG və ya WEBP formatında, maksimum 10 MB şəkil seçin.');return;}let imagePath=null;if(file){imagePath=Date.now()+'-'+crypto.randomUUID()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const {error}=await client.storage.from(bucket).upload(imagePath,file,{upsert:false,contentType:file.type});if(error){alert('Şəkil yüklənmədi: '+error.message);return;}}
+ const payload={title:$('processTitle').value.trim(),category:$('processCategory').value.trim(),description:$('processDescription').value.trim(),user_story:$('processStory').value.trim(),acceptance_criteria:$('processCriteria').value.trim(),is_public:$('processPublic').checked,updated_at:new Date().toISOString()};if(imagePath)payload.image_path=imagePath;
+ const result=id?await client.from('process_cases').update(payload).eq('id',id):await client.from('process_cases').insert({...payload,image_path:imagePath,created_by:currentUser.id});if(result.error){if(imagePath)await client.storage.from(bucket).remove([imagePath]);alert('Yadda saxlamaq mümkün olmadı: '+result.error.message);return;}resetProcess();await loadProcesses();message('authStatus','Proses nümunəsi yadda saxlanıldı.');});
 })();

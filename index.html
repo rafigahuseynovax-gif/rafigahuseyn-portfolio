@@ -6,6 +6,7 @@
 <meta name="description" content="Rəfiqə Hüseynova — Business Analysis, Product, BPMN portfolio">
 <title>Rəfiqə Hüseynova | Portfolio</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="process-cases.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Google Analytics: öz G-... Measurement ID-ni əlavə etdikdən sonra aktiv olacaq. -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
@@ -20,7 +21,7 @@
 <body>
 <header class="nav"><div class="wrap navin">
   <a class="brand" href="#home">RH<span>.</span> portfolio</a>
-  <nav class="links"><a href="#projects">Layihələr</a><a href="#quick-links">Qısa keçidlər</a><a href="#bpmn">BPMN</a><a href="#cv">CV</a><a href="#contact">Kontakt</a></nav>
+  <nav class="links"><a href="#projects">Layihələr</a><a href="#quick-links">Qısa keçidlər</a><a href="#processes">Proseslər</a><a href="#cv">CV</a><a href="#contact">Kontakt</a></nav>
   <div class="nav-actions"><a class="pill light" href="admin.html">Admin</a><a class="pill" href="#contact">Əlaqə ↗</a></div>
 </div></header>
 <main class="wrap" id="home">
@@ -36,7 +37,6 @@
   <div class="stat"><strong>PRD</strong><span>Product Requirements</span></div>
   <div class="stat"><strong>BPMN</strong><span>Process Modeling</span></div>
 </div>
-
 <section class="section" id="projects">
   <div class="sectionhead"><div><div class="kicker">01 / Seçilmiş işlər</div><h2>Layihələr</h2></div><p class="sub">Kateqoriyanı seçərək layihələri PRD, Miro, Figma AI və BPMN üzrə filtrlə.</p></div>
   <div class="filters">
@@ -48,19 +48,15 @@
     <article class="project" data-tags="prd"><div class="projecttop"><span class="type">PRD · PDF</span><span class="arrow">↗</span></div><h3>Kredit müraciəti üzrə PRD</h3><p>Yarımçıq qalan kredit müraciətini davam etdirmək və ya yenidən başlatmaq üçün məhsul tələbləri sənədi.</p><div class="chips"><span class="chip">User stories</span><span class="chip">Acceptance criteria</span><span class="chip">FR / NFR</span></div><div class="project-actions"><a class="pill light" href="PRD.pdf" target="_blank" rel="noopener noreferrer">PRD-ə bax ↗</a></div></article>
   </div><p class="empty" id="emptyState">Bu kateqoriyada layihə yoxdur.</p>
 </section>
-
 <section class="section" id="quick-links">
   <div class="sectionhead"><div><div class="kicker">02 / Sürətli giriş</div><h2>Layihələrə qısa keçidlər</h2></div><p class="sub">Admin paneldən əlavə edilən keçidlər burada görünəcək.</p></div>
   <div id="quickLinksList" class="projects"></div><p class="empty" id="quickLinksEmpty">Hələ keçid əlavə edilməyib.</p>
   <p class="sub tiny">Qısa keçidləri idarə etmək üçün Admin bölməsinə daxil olun.</p>
 </section>
-
 <section class="section" id="bpmn">
-  <div class="sectionhead"><div><div class="kicker">03 / Proses modelləşdirmə</div><h2>BPMN</h2></div><p class="sub">Kredit müraciətinin sadələşdirilmiş proses axını.</p></div>
-  <div class="bpmn-layout"><div class="bpmn-copy"><div class="kicker">Process overview</div><h3>Müraciət axını</h3><p>Prosesin əsas mərhələləri: müraciətin qəbulu, məlumatların yoxlanması və nəticənin bildirilməsi.</p><div class="steps">01 — Müraciət daxil olur<br>02 — Məlumatlar yoxlanılır<br>03 — Qərar verilir</div></div>
-  <div class="diagram"><div class="flow"><div class="node start">Başlanğıc</div><span class="connector">→</span><div class="node">Müraciəti qəbul et</div><span class="connector">→</span><div class="node">Məlumatları yoxla</div><span class="connector">→</span><div class="node">Qərar</div><span class="connector">→</span><div class="node end">Nəticə</div></div></div></div>
+  <div class="sectionhead"><div><div class="kicker">03 / Proses və analiz nümunələri</div><h2>Proseslər & User Stories</h2></div><p class="sub">Prosesin vizualını, problemin izahını və user story-ni bir yerdə təqdim edirəm.</p></div>
+  <div id="processCases" class="process-grid"><p class="sub">Proses nümunələri yüklənir…</p></div>
 </section>
-
 <section class="section" id="cv">
   <div class="sectionhead"><div><div class="kicker">04 / CV & Sənədlər</div><h2>CV & Sənədlər</h2></div><p class="sub">Admin paneldə yüklənmiş CV və portfolio sənədləri ziyarətçilər üçün burada göstəriləcək.</p></div>
   <div class="panel"><h3>CV</h3><p class="sub">CV-nin PDF versiyasına bax və ya yüklə.</p>
@@ -72,7 +68,6 @@
        rel="noopener noreferrer">
       CV-yə bax ↗
     </a>
-
     <a class="pill light"
        href="Rafiga%20Huseynova%20CV.pdf"
        download="Rafiga-Huseynova-CV.pdf">
@@ -83,7 +78,6 @@
 </div>
   <div class="panel"><h3>Portfolio sənədləri</h3><div id="documentsPublic" class="file-list"><p class="sub">Hələ əlavə edilmiş sənəd yoxdur.</p></div></div>
 </section>
-
 <section class="section" id="contact">
   <div class="contactbox"><div><div class="kicker">05 / Kontakt</div><h2>Birlikdə dəyər yaradaq.</h2><p>Yeni layihə, əməkdaşlıq və ya iş imkanları üçün mənimlə əlaqə saxlaya bilərsən.</p></div>
   <div class="contactlinks"><a class="contactlink" href="https://mail.google.com/mail/?view=cm&to=rafiga.huseynovax@gmail.com" target="_blank" rel="noopener noreferrer"><span>✉ rafiga.huseynovax@gmail.com</span><span>↗</span></a><a class="contactlink" href="https://www.linkedin.com/in/rafiga-huseynova-0691b31b3" target="_blank" rel="noopener noreferrer"><span>in LinkedIn profilim</span><span>↗</span></a></div></div>
@@ -92,4 +86,5 @@
 </main>
 <script src="config.js"></script>
 <script src="app.js"></script>
+<script src="process-cases.js"></script>
 </body></html>
