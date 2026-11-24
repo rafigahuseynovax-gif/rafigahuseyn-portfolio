@@ -8,3 +8,53 @@
 /* Admin form sahələri */
 .field textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fffdf9;font:inherit;color:var(--ink);resize:vertical;min-height:90px}
 #processImagePreview img{display:block}
+
+.process-image {
+  cursor: zoom-in;
+}
+
+.process-lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(20, 19, 17, 0.94);
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.process-lightbox.active {
+  display: flex;
+}
+
+.process-lightbox img {
+  max-width: 95vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  cursor: zoom-out;
+}
+
+.process-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 42px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .process-lightbox {
+    padding: 12px;
+  }
+
+  .process-lightbox img {
+    max-width: 100%;
+    max-height: 85vh;
+  }
+}
